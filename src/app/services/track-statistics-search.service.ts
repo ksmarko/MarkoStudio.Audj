@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -15,11 +15,21 @@ export class TrackStatisticsSearchService {
         return this.httpClient.get<TotalMatchesResponse>(url);
     }
 
-    public searchProfile(term: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
+    public searchProfile(term: string, tags: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
     
-        var url = `https://cors-anywhere.herokuapp.com/https://audiojungle.net/shopfront-api/search?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance&term=${term}`;
+        var url = `https://cors-anywhere.herokuapp.com/https://audiojungle.net/shopfront-api/search?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
     
-        return this.httpClient.get<TermSearchResult>(url);
+        let params = new HttpParams();
+
+        if (term){
+            params = params.append('term', term);
+        }
+
+        if (tags && tags.length > 0){
+            params = params.append('tags', tags);
+        }
+
+        return this.httpClient.get<TermSearchResult>(url, { params: params });
     }
 }
 
@@ -28,6 +38,7 @@ export class TotalMatchesResponse {
 }
 
 export class TermSearchResult{
+    total_hits: number;
     matches: TrackSearchResult[];
 }
 

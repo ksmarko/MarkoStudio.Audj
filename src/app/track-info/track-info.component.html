@@ -8,9 +8,11 @@
     </thead>
     <tbody>
       <tr *ngFor="let record of records">
-        <td>{{ record.trackName }}</td>
         <td>
-          {{ record.trackUrl }}
+          {{record.trackName}}
+        </td>
+        <td>
+          <a href="{{ record.trackUrl }}" target="_blank">{{record.trackUrl}}</a>
         </td>
         <td>{{ record.pageNumber }}</td>
       </tr>
