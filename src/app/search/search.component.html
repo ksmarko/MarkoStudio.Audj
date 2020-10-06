@@ -1,0 +1,26 @@
+<div>
+    <div class="input-group" [formGroup]="searchProfile">
+      <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Username"
+      id="profile-search"
+      formControlName="userName"
+      class="c-input mr-sm-2"
+      [autofocus]>
+
+      <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Search"
+      id="term-search"
+      formControlName="termSearch"
+      class="c-input mr-sm-2"
+      [autofocus]>
+
+
+      <button 
+        class="btn c-btn-input my-2 my-sm-0" 
+        (click)="composeResult()">Пошук</button>
+    </div>
+</div>
