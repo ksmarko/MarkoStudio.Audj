@@ -19,6 +19,8 @@ export class SearchComponent implements OnInit {
   public errorMessage: string;
   public informationMessage: string;
 
+  public isLoading: boolean = false;
+
   constructor(
     private trackStatisticsSearchService: TrackStatisticsSearchService,
     private formBuilder: FormBuilder
@@ -53,6 +55,8 @@ export class SearchComponent implements OnInit {
     this.userChangeEmitter.emit(null); 
 
       do {
+        this.isLoading = true;
+
         await this.trackStatisticsSearchService.searchProfile(terms, tags, ++pageNumber, pageSize).toPromise().then(
           result => {
             pagesCount = 10; // max pages count for now
@@ -87,6 +91,8 @@ export class SearchComponent implements OnInit {
 
       // aggregateResult.push(example);
 
+      this.isLoading = false;
+      
       if (aggregateResult.length > 0){
         this.userChangeEmitter.emit(aggregateResult); 
       }
