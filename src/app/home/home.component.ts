@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { TrackSearchResponse } from '../services/track-statistics-search.service';
+import { Page } from '../search/search.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html'
 })
 export class HomeComponent {
-  public tracks: TrackSearchResponse[];
+  public page: Page;
 
-  public updateSearchedRecipient(tracks: TrackSearchResponse[]): void {
-    this.tracks = tracks;
+  public updateSearchedRecipient(page: Page): void {
+    this.page = page;
   }
 }

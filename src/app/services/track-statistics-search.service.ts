@@ -13,6 +13,16 @@ export class TrackStatisticsSearchService {
     ) {
     }
 
+    public getTracksPage(username: string): Observable<TracksPageResponse> {
+        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}`;
+
+        let headers = {
+            'Authorization': `Bearer ${this.key}`
+        };
+
+        return this.httpClient.get<TracksPageResponse>(url, {headers: headers});
+    }
+
     public getTrackNames(username: string) : Observable<TrackSearchResponse[]> {
         let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}`;
 
@@ -35,7 +45,7 @@ export class TrackStatisticsSearchService {
 
     public searchProfile(term: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
     
-        var url = `https://cors-anywhere.herokuapp.com/https://audiojungle.net/shopfront-api/search?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
+        var url = `https://api.envato.com/v1/discovery/search/search/item?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
     
         let params = new HttpParams();
 
@@ -43,8 +53,25 @@ export class TrackStatisticsSearchService {
             params = params.append('term', term);
         }
 
-        return this.httpClient.get<TermSearchResult>(url, { params: params });
+        let headers = {
+            'Authorization': `Bearer ${this.key}`
+        };
+
+        return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers });
     }
+}
+
+export class TracksPageResponse {
+    matches: TrackSearchResponse[];
+    total_hits: number;
+    links: TracksPageLinksResponse;
+}
+
+export class TracksPageLinksResponse{
+    next_page_url: string;
+    prev_page_url: string;
+    first_page_url: string;
+    last_page_url: string;
 }
 
 export class TrackSearchResponse{

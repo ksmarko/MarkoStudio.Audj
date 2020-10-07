@@ -11,6 +11,9 @@
   <div *ngIf="errorMessage" class="alert alert-danger row" role="alert">
     {{errorMessage}}
   </div>
+  <div *ngIf="infoMessage" class="alert alert-warning row" role="alert">
+    {{infoMessage}}
+  </div>
 </form>
 <div class='lmask' *ngIf="isLoading"></div>
 
