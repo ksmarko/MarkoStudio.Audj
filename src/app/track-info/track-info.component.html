@@ -3,7 +3,7 @@
       <tr>
         <th>Track name</th>
         <th>Copy link</th>
-        <th>Page number</th>
+        <th>Is on first page</th>
       </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
         <td>
           <a href="{{ record.trackUrl }}" target="_blank">{{record.trackUrl}}</a>
         </td>
-        <td>{{ record.pageNumber }}</td>
+        <td>{{detectFirstPage(record.trackName)}}</td>
       </tr>
     </tbody>
   </table>

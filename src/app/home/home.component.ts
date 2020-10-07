@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { SearchResultAggregate } from '../search/search.component';
+import { TrackSearchResponse } from '../services/track-statistics-search.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html'
 })
 export class HomeComponent {
-  public searchResultAggregate: SearchResultAggregate[];
+  public tracks: TrackSearchResponse[];
 
-  public updateSearchedRecipient(aggregate: SearchResultAggregate[]): void {
-    this.searchResultAggregate = aggregate;
+  public updateSearchedRecipient(tracks: TrackSearchResponse[]): void {
+    this.tracks = tracks;
   }
 }

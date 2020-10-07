@@ -4,9 +4,29 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class TrackStatisticsSearchService {
+
+    private key: string = 'Xak16vI58CMsfRusJcNifADxfKTDAiHk';
+
     constructor(
         private httpClient: HttpClient,
     ) {
+    }
+
+    public getTrackNames(username: string) : Observable<TrackSearchResponse[]> {
+        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}`;
+
+        let headers = {
+            'Authorization': `Bearer ${this.key}`
+        };
+
+        return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
+        .pipe(map(response => {
+            return response.matches.map(match => {
+                name: match.name,
+                url: match.url,
+                author_username: match.author_username
+            });
+        }));
     }
 
     public getTotalMatches(term: string) : Observable<TotalMatchesResponse> {
@@ -15,7 +35,7 @@ export class TrackStatisticsSearchService {
         return this.httpClient.get<TotalMatchesResponse>(url);
     }
 
-    public searchProfile(term: string, tags: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
+    public searchProfile(term: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
     
         var url = `https://cors-anywhere.herokuapp.com/https://audiojungle.net/shopfront-api/search?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
     
@@ -25,12 +45,14 @@ export class TrackStatisticsSearchService {
             params = params.append('term', term);
         }
 
-        if (tags && tags.length > 0){
-            params = params.append('tags', tags);
-        }
-
         return this.httpClient.get<TermSearchResult>(url, { params: params });
     }
+}
+
+export class TrackSearchResponse{
+    name: string;
+    url: string;
+    author_username: string;
 }
 
 export class TotalMatchesResponse {

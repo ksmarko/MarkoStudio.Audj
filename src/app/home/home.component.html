@@ -5,9 +5,9 @@
       </app-search>
     </div>
       
-    <div *ngIf="searchResultAggregate" class="mt-3">
+    <div *ngIf="tracks" class="mt-3">
       <app-track-info 
-        [records]="searchResultAggregate">
+        [records]="tracks">
       </app-track-info>
     
     </div>
