@@ -45,7 +45,10 @@ export class SearchComponent implements OnInit {
     this.userChangeEmitter.emit(null); 
     this.isLoading = true;
 
-    this.trackStatisticsSearchService.getTracksPage(userName)
+    let pageNumber = 1;
+    let pageSize = 30;
+
+    this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
       .pipe(mergeMap(page => {
       
         let records = forkJoin(page.matches.map(track => {
@@ -69,15 +72,15 @@ export class SearchComponent implements OnInit {
       .subscribe(result => {
         this.isLoading = false;
 
-        let fromFirstPage = result.records.filter(rec => rec.isOnFirstPage == true);
+        let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
 
         let allTracksCount = result.records.length;
-        let trendingTracksCount = fromFirstPage.length;
+        let nonTrendingTracksCount = notFirstPage.length;
 
-        if (allTracksCount != trendingTracksCount)
-          this.infoMessage = `Showing ${trendingTracksCount} of ${allTracksCount}`;
+        if (allTracksCount != nonTrendingTracksCount)
+          this.infoMessage = `Showing ${nonTrendingTracksCount} of ${allTracksCount}`;
   
-          result.records = fromFirstPage;
+          result.records = notFirstPage;
 
         this.userChangeEmitter.emit(result);
       }, error => {
