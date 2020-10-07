@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-\import { TrackStatisticsSearchService, TrackSearchResponse } from '../services/track-statistics-search.service';
+import { TrackStatisticsSearchService, TrackSearchResponse } from '../services/track-statistics-search.service';
 
 @Component({
   selector: 'app-track-info',
@@ -8,7 +8,9 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class TrackInfoComponent implements OnInit {
 
-  @Input() records: string[];
+  @Input() record: TrackSearchResponse;
+
+  public isOnFirstPage: boolean;
 
   public errorMessage: string = '';
 
@@ -17,20 +19,13 @@ export class TrackInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-  }
-
-  public async detectFirstPage(track: TrackSearchResponse): Promise<boolean> {
     let pageNumber = 1;
     let pageSize = 30;
 
-    let isOnFirstPage = false;
-
-    await this.trackStatisticsSearchService.searchProfile(track.name, pageNumber, pageSize).toPromise().then(result => {
-      isOnFirstPage = result.matches.some(x => x.author_username == track.author_username);
+    this.trackStatisticsSearchService.searchProfile(this.record.name, pageNumber, pageSize).subscribe(result => {
+      this.isOnFirstPage = result.matches.some(x => x.author_username == this.record.author_username && x.name == this.record.name);
     }, error => {
       this.errorMessage = error.error;
     });
-
-    return isOnFirstPage;
   }
 }

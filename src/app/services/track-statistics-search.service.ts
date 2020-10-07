@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TrackStatisticsSearchService {
@@ -20,13 +21,10 @@ export class TrackStatisticsSearchService {
         };
 
         return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
-        .pipe(map(response => {
-            return response.matches.map(match => {
-                name: match.name,
-                url: match.url,
-                author_username: match.author_username
-            });
-        }));
+            .pipe(
+                map((response: any) => {
+                    return response.matches.map(match => new TrackSearchResponse(match.name, match.url, match.author_username));
+                }));
     }
 
     public getTotalMatches(term: string) : Observable<TotalMatchesResponse> {
@@ -41,7 +39,7 @@ export class TrackStatisticsSearchService {
     
         let params = new HttpParams();
 
-        if (term){
+        if (term) {
             params = params.append('term', term);
         }
 
@@ -53,6 +51,12 @@ export class TrackSearchResponse{
     name: string;
     url: string;
     author_username: string;
+
+    constructor(name: string, url: string, author: string){
+        this.name = name;
+        this.url = url;
+        this.author_username = author;
+    }
 }
 
 export class TotalMatchesResponse {

@@ -1,20 +1,7 @@
-<table class='table table-striped' aria-labelledby="tableLabel">
-    <thead>
-      <tr>
-        <th>Track name</th>
-        <th>Copy link</th>
-        <th>Is on first page</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let record of records">
-        <td>
-          {{record.trackName}}
-        </td>
-        <td>
-          <a href="{{ record.trackUrl }}" target="_blank">{{record.trackUrl}}</a>
-        </td>
-        <td>{{detectFirstPage(record.trackName)}}</td>
-      </tr>
-    </tbody>
-  </table>
+<td>
+  {{record.name}}
+</td>
+<td>
+  <a href="{{ record.url }}" target="_blank">{{record.url}}</a>
+</td>
+<td>{{isOnFirstPage}}</td>
