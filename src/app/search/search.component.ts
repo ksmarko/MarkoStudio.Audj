@@ -55,7 +55,7 @@ export class SearchComponent implements OnInit {
     this.isLoading = true;
 
     let pageNumber = 1;
-    let pageSize = 30;
+    let pageSize = 100;
 
     this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
     .pipe(mergeMap(page => {
@@ -82,35 +82,29 @@ export class SearchComponent implements OnInit {
 
             let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
   
-            return new Record(track.name, track.url, isOnFirstPage);
+            return new Record(track.id, track.name, track.url, isOnFirstPage);
           }));
         });
 
-
         let numberOfObjects = 1 // <-- decides number of objects in each group
 
-let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
-  const chunkIndex = Math.floor(index/numberOfObjects);
+        let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
+          const chunkIndex = Math.floor(index/numberOfObjects);
 
-  if(!resultArray[chunkIndex]) {
-    resultArray[chunkIndex] = []; // start a new chunk
-  }
+          if(!resultArray[chunkIndex]) {
+            resultArray[chunkIndex] = []; // start a new chunk
+          }
 
-  resultArray[chunkIndex].push(item);
+          resultArray[chunkIndex].push(item);
 
-  return resultArray;
-}, []);
+          return resultArray;
+        }, []);
 
-let records = forkJoin(groupedProducts[0]);
+        let records = forkJoin(groupedProducts[0]);
 
-for (let i = 1; i < groupedProducts.length; i++){
-
-  // todo: wait....
-
-    //console.log(`time reached: index num ${i}`);
-
-    records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
-}
+        for (let i = 1; i < groupedProducts.length; i++){
+          records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
+        }
 
         return records.pipe(map(tr => {
             return new Page(null, 0, tr);
@@ -120,18 +114,11 @@ for (let i = 1; i < groupedProducts.length; i++){
     .subscribe(result => {
       this.isLoading = false;
 
+      result.records = result.records.sort((a, b) => a.trackName.localeCompare(b.trackName));
+
       console.log(`Records count: ${result.records.length}`);
 
       let allTracksCount = result.records.length;
-
-      let distinct = result.records
-        .filter((value, index, self) => self.map(x => x.trackUrl).indexOf(value.trackUrl) === index);
-
-        if (distinct.length != result.records.length){
-          console.log(`Distinct records count: ${distinct.length}`);
-          result.records = distinct;
-        }
-
       let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
 
       let nonTrendingTracksCount = notFirstPage.length;
@@ -170,11 +157,13 @@ export class Page {
 }
 
 export class Record {
+  id: number;
   trackName: string;
   trackUrl: string;
   isOnFirstPage: boolean;
 
-  constructor(trackName: string, trackUrl: string, isOnFirstPage: boolean){
+  constructor(id: number,trackName: string, trackUrl: string, isOnFirstPage: boolean){
+    this.id = id;
     this.trackName = trackName;
     this.trackUrl = trackUrl;
     this.isOnFirstPage = isOnFirstPage;

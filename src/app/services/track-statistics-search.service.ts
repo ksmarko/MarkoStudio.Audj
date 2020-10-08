@@ -34,7 +34,7 @@ export class TrackStatisticsSearchService {
         return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
             .pipe(
                 map((response: any) => {
-                    return response.matches.map(match => new TrackSearchResponse(match.name, match.url, match.author_username));
+                    return response.matches.map(match => new TrackSearchResponse(match.id, match.name, match.url, match.author_username));
                 }));
     }
 
@@ -76,11 +76,13 @@ export class TracksPageLinksResponse{
 }
 
 export class TrackSearchResponse{
+    id: number;
     name: string;
     url: string;
     author_username: string;
 
-    constructor(name: string, url: string, author: string){
+    constructor(id: number, name: string, url: string, author: string){
+        this.id = id;
         this.name = name;
         this.url = url;
         this.author_username = author;
