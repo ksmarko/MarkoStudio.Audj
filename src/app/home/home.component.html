@@ -1,0 +1,31 @@
+<div class="col mt-3">
+    <div class="row">
+      <app-search 
+        (userChange)="updateSearchedRecipient($event)">
+      </app-search>
+    </div>
+      
+    <div *ngIf="page" class="mt-3">
+
+      <table class='table table-striped' aria-labelledby="tableLabel">
+        <thead>
+          <tr>
+            <th>Трек</th>
+            <th>Лінк</th>
+            <!-- <th>Is on first page</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of page.records">
+            <td>
+              {{record.trackName}}
+            </td>
+            <td>
+              <a href="{{ record.trackUrl }}" target="_blank">{{record.trackUrl}}</a>
+            </td>
+            <!-- <td>{{record.isOnFirstPage}}</td> -->
+          </tr>
+        </tbody>
+      </table>    
+    </div>
+  </div>
