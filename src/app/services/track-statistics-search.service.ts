@@ -15,7 +15,7 @@ export class TrackStatisticsSearchService {
     }
 
     public getTracksPage(username: string, pageNumber: number, pageSize: number): Observable<TracksPageResponse> {
-        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}`;
+        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}&sort_by=name`;
 
         let headers = {
             'Authorization': `Bearer ${this.key}`
