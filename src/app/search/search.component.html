@@ -1,12 +1,13 @@
 <form>
   <div class="form-group" [formGroup]="searchProfile">
     <label for="profile-search">Ім'я користувача</label>
-    <input type="text" class="form-control" id="profile-search" placeholder="Наприклад, ToucanMusic" formControlName="userName" [autofocus]>
+    <input type="text" class="form-control" id="profile-search" placeholder="Наприклад, ToucanMusic" formControlName="userName" [autofocus] [(ngModel)]="usernameExists">
   </div>
   <div class="form-group" [formGroup]="searchProfile">
     <button 
         class="btn c-btn-input my-2 my-sm-0" 
-        (click)="composeResult()">Пошук</button>
+        (click)="composeResult()"
+        [disabled]="!usernameExists || usernameExists.trim().length <= 0">Пошук</button>
   </div>
   <div *ngIf="errorMessage" class="alert alert-danger row" role="alert">
     {{errorMessage}}

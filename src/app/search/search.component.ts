@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, Validators, AbstractControl, FormGroup } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
-import { concatMap, flatMap, map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { TrackStatisticsSearchService, TrackSearchResponse, TracksPageResponse } from '../services/track-statistics-search.service';
 
 @Component({
@@ -24,6 +24,8 @@ export class SearchComponent implements OnInit {
   public allTracksCount: number = 0;
   public handledTracksCount: number = 0;
 
+  public usernameExists: string;
+
   constructor(
     private trackStatisticsSearchService: TrackStatisticsSearchService,
     private formBuilder: FormBuilder
@@ -38,11 +40,15 @@ export class SearchComponent implements OnInit {
 
     this.errorMessage = "";
     this.infoMessage = "";
+    this.allTracksCount = 0;
+    this.handledTracksCount = 0;
   }
 
   public composeResult(): void {
     let userName = this.userNameControl.value;
 
+    this.allTracksCount = 0;
+    this.handledTracksCount = 0;
     this.errorMessage = '';
     this.infoMessage = '';
     this.userChangeEmitter.emit(null); 
@@ -50,7 +56,6 @@ export class SearchComponent implements OnInit {
 
     let pageNumber = 1;
     let pageSize = 30;
-
 
     this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
     .pipe(mergeMap(page => {
@@ -102,7 +107,7 @@ for (let i = 1; i < groupedProducts.length; i++){
 
   // todo: wait....
 
-    console.log(`time reached: index num ${i}`);
+    //console.log(`time reached: index num ${i}`);
 
     records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
 }
@@ -115,11 +120,20 @@ for (let i = 1; i < groupedProducts.length; i++){
     .subscribe(result => {
       this.isLoading = false;
 
-      console.log(result.records.length);
+      console.log(`Records count: ${result.records.length}`);
+
+      let allTracksCount = result.records.length;
+
+      let distinct = result.records
+        .filter((value, index, self) => self.map(x => x.trackUrl).indexOf(value.trackUrl) === index);
+
+        if (distinct.length != result.records.length){
+          console.log(`Distinct records count: ${distinct.length}`);
+          result.records = distinct;
+        }
 
       let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
 
-      let allTracksCount = result.records.length;
       let nonTrendingTracksCount = notFirstPage.length;
 
       if (allTracksCount != nonTrendingTracksCount)
