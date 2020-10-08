@@ -6,7 +6,8 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class TrackStatisticsSearchService {
 
-    private key: string = 'Xak16vI58CMsfRusJcNifADxfKTDAiHk';
+    //private key: string = 'Xak16vI58CMsfRusJcNifADxfKTDAiHk';
+    private key: string = 'UaFDgUEXtSND5ToRnghqopJnTOTSGetB';
 
     constructor(
         private httpClient: HttpClient,
