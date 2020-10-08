@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, Validators, AbstractControl, FormGroup } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
-import { flatMap, map, mergeMap } from 'rxjs/operators';
+import { concatMap, flatMap, map, mergeMap } from 'rxjs/operators';
 import { TrackStatisticsSearchService, TrackSearchResponse, TracksPageResponse } from '../services/track-statistics-search.service';
 
 @Component({
@@ -20,6 +20,9 @@ export class SearchComponent implements OnInit {
   public infoMessage: string;
 
   public isLoading: boolean = false;
+
+  public allTracksCount: number = 0;
+  public handledTracksCount: number = 0;
 
   constructor(
     private trackStatisticsSearchService: TrackStatisticsSearchService,
@@ -63,16 +66,46 @@ export class SearchComponent implements OnInit {
       return forkJoin(pages).pipe(mergeMap(c => {
         let matches = new Array<TrackSearchResponse>().concat(...c.concat(page).map(item => item.matches));
 
-        let records = forkJoin(matches.map(track => {
+        this.allTracksCount = matches.length;
+
+        let recordsObservables = matches.map(track => {
 
           return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
           .pipe(map(r => {
   
+            this.handledTracksCount++;
+
             let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
   
             return new Record(track.name, track.url, isOnFirstPage);
           }));
-        }));
+        });
+
+
+        let numberOfObjects = 1 // <-- decides number of objects in each group
+
+let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
+  const chunkIndex = Math.floor(index/numberOfObjects);
+
+  if(!resultArray[chunkIndex]) {
+    resultArray[chunkIndex] = []; // start a new chunk
+  }
+
+  resultArray[chunkIndex].push(item);
+
+  return resultArray;
+}, []);
+
+let records = forkJoin(groupedProducts[0]);
+
+for (let i = 1; i < groupedProducts.length; i++){
+
+  // todo: wait....
+
+    console.log(`time reached: index num ${i}`);
+
+    records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
+}
 
         return records.pipe(map(tr => {
             return new Page(null, 0, tr);
@@ -90,7 +123,7 @@ export class SearchComponent implements OnInit {
       let nonTrendingTracksCount = notFirstPage.length;
 
       if (allTracksCount != nonTrendingTracksCount)
-        this.infoMessage = `Showing ${nonTrendingTracksCount} of ${allTracksCount}`;
+        this.infoMessage = `Всього треків: ${allTracksCount}. Не на першій сторінці пошуку: ${nonTrendingTracksCount}`;
 
         result.records = notFirstPage;
 
@@ -107,58 +140,6 @@ export class SearchComponent implements OnInit {
 
       this.userChangeEmitter.emit(null);
     });
-
-//////////////////
-
-    // this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
-    //   .pipe(mergeMap(page => {
-      
-    //     let records = forkJoin(page.matches.map(track => {
-
-    //       return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
-    //       .pipe(map(r => {
-
-    //         let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
-
-    //         return new Record(track.name, track.url, isOnFirstPage);
-    //       }));
-    //     }));
-
-    //     let a = records.pipe(map(tr => {
-
-    //       let links = new Links(page.links.next_page_url, page.links.prev_page_url, page.links.first_page_url, page.links.last_page_url);
-
-    //       return new Page(links, page.total_hits, tr);
-    //     }));
-
-    //     return a;
-    //   }))
-    //   .subscribe(result => {
-    //     this.isLoading = false;
-
-    //     let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
-
-    //     let allTracksCount = result.records.length;
-    //     let nonTrendingTracksCount = notFirstPage.length;
-
-    //     if (allTracksCount != nonTrendingTracksCount)
-    //       this.infoMessage = `Showing ${nonTrendingTracksCount} of ${allTracksCount}`;
-  
-    //       result.records = notFirstPage;
-
-    //     this.userChangeEmitter.emit(result);
-    //   }, error => {
-
-    //     this.isLoading = false;
-
-    //     if (error.status == 404)
-    //       this.errorMessage = 'Сторінка не знайдена';
-  
-    //     if (error.status >= 400)
-    //       this.errorMessage = 'Щось пішло не так. Спробуйте пізніше';
-  
-    //     this.userChangeEmitter.emit(null);
-    // });
   }
 }
 
