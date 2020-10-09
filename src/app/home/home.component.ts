@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, Observable } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { TrackStatisticsSearchService } from '../services/track-statistics-search.service';
 
 @Component({
@@ -85,6 +85,9 @@ export class HomeComponent implements OnInit {
             let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
         
             return new Record(track.id, track.name, track.url, isOnFirstPage);
+          }), catchError(err => {
+            this.errorMessage = 'Забагато запитів. Спробуйте пізніше, зменшивши кількість одночасних запитів і кількість треків на сторінці';
+            return throwError(err);
           }));
         });
       
@@ -114,7 +117,11 @@ export class HomeComponent implements OnInit {
         return records.pipe(map(tr => {
           return new Page(page.total_hits, tr);
         }));
-      }))
+      }), catchError(err => {
+        console.log('Error during fetching user tracks ', err);
+        this.errorMessage = 'Забагато запитів. Спробуйте пізніше';
+        return throwError(err);
+    }))
       .subscribe(result => {
         this.isLoading = false;
 
