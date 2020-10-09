@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
     let userName = this.userNameControl.value;
     let itemsInParallel = this.itemsInParallelControl.value || 3;
 
-    this.pageSize = this.itemsPerPageControl.value || 50;
+    this.pageSize = this.itemsPerPageControl.value || 30;
     this.allTracksCount = 0;
     this.handledTracksCount = 0;
     this.errorMessage = '';
