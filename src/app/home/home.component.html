@@ -1,31 +1,83 @@
 <div class="col mt-3">
     <div class="row">
-      <app-search 
-        (userChange)="updateSearchedRecipient($event)">
-      </app-search>
+      <form>
+        <div class="form-group" [formGroup]="searchProfile">
+          <label for="profile-search">Ім'я користувача</label>
+          <input type="text" class="form-control" id="profile-search" placeholder="Наприклад, ToucanMusic" formControlName="userName" [autofocus] [(ngModel)]="usernameExists">
+        </div>
+        <div class="form-group" [formGroup]="searchProfile">
+          <label for="parallel-dropdown">Кількість одночасних запитів</label>
+          <div class="dropdown" id="parallel-dropdown">
+            <select class="form-control" formControlName="itemsInParallel">
+              <option *ngFor="let item of availableParallelizationItems" 
+                [selected]="item == 3">{{item}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" [formGroup]="searchProfile">
+          <label for="items-per-page-dropdown">Кількість треків на сторінці</label>
+          <div class="dropdown" id="items-per-page-dropdown">
+            <select class="form-control" formControlName="itemsPerPage">
+              <option *ngFor="let item of availableItemsPerPage" 
+                [selected]="item == 30">{{item}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" [formGroup]="searchProfile">
+          <button 
+              class="btn c-btn-input my-2 my-sm-0" 
+              (click)="getNextPageResults(1)"
+              [disabled]="!usernameExists || usernameExists.trim().length <= 0">Пошук</button>
+        </div>
+        <div *ngIf="errorMessage" class="alert alert-danger row" role="alert">
+          {{errorMessage}}
+        </div>
+        <div *ngIf="infoMessage" class="alert alert-warning row" role="alert">
+          {{infoMessage}}
+        </div>
+        <div *ngIf="isLoading">
+          <p>Отримання даних. Це може зайняти декілька хвилин</p>
+          <p>Опрацьовано {{handledTracksCount}} із {{allTracksCount}}</p>
+          <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div>
+        </div>
+      </form>
     </div>
       
-    <div *ngIf="page" class="mt-3">
+    <div *ngIf="tracksPage" class="mt-3">
 
       <table class='table table-striped' aria-labelledby="tableLabel">
         <thead>
           <tr>
             <th>Трек</th>
             <th>Лінк</th>
-            <!-- <th>Is on first page</th> -->
+            <th style="text-align: center">На першій сторінці?</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let record of page.records">
+          <tr *ngFor="let record of tracksPage.records">
             <td>
               {{record.trackName}}
             </td>
             <td>
               <a href="{{ record.trackUrl }}" target="_blank">{{record.trackUrl}}</a>
             </td>
-            <!-- <td>{{record.isOnFirstPage}}</td> -->
+            <td style="text-align: center">
+              <i *ngIf="record.isOnFirstPage" class="fa fa-check-circle itemsuccess"></i>
+              <i *ngIf="!record.isOnFirstPage" class="fa fa-times-circle itemfail"></i>
+            </td>
           </tr>
         </tbody>
-      </table>    
+      </table>  
+      <ngb-pagination 
+      [collectionSize]="totalTracksCount" 
+      [(page)]="currentPage" 
+      [pageSize]="pageSize"
+      aria-label="Default pagination"
+      [boundaryLinks]="true"
+      (pageChange)="getNextPageResults($event)"></ngb-pagination> 
     </div>
   </div>
