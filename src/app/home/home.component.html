@@ -6,18 +6,20 @@
           <input type="text" class="form-control" id="profile-search" placeholder="Наприклад, ToucanMusic" formControlName="userName" [autofocus] [(ngModel)]="usernameExists">
         </div>
         <div class="form-group" [formGroup]="searchProfile">
-          <div class="dropdown">
+          <label for="parallel-dropdown">Кількість одночасних запитів</label>
+          <div class="dropdown" id="parallel-dropdown">
             <select class="form-control" formControlName="itemsInParallel">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
+              <option *ngFor="let item of availableParallelizationItems" 
+                [selected]="item == 3">{{item}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" [formGroup]="searchProfile">
+          <label for="items-per-page-dropdown">Кількість треків на сторінці</label>
+          <div class="dropdown" id="items-per-page-dropdown">
+            <select class="form-control" formControlName="itemsPerPage">
+              <option *ngFor="let item of availableItemsPerPage" 
+                [selected]="item == 30">{{item}}</option>
             </select>
           </div>
         </div>

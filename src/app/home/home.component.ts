@@ -15,9 +15,12 @@ export class HomeComponent implements OnInit {
   public totalTracksCount: number;
   public currentPage: number = 1;
   public pageSize: number = 30;
+  public availableParallelizationItems: Array<number> = [1,2,3,4,5,6,7,8,9,10];
+  public availableItemsPerPage: Array<number> = [10, 30, 50, 100];
 
   private userNameControl: AbstractControl;
   private itemsInParallelControl: AbstractControl;
+  private itemsPerPageControl: AbstractControl;
   public searchProfile: FormGroup;
 
   public errorMessage: string;
@@ -39,10 +42,12 @@ export class HomeComponent implements OnInit {
     this.searchProfile = this.formBuilder.group({
       userName: [null, [Validators.required, Validators.pattern('[^\w]'), Validators.nullValidator]],
       itemsInParallel: [null],
+      itemsPerPage: [null],
     });
 
     this.userNameControl =  this.searchProfile.get('userName');
     this.itemsInParallelControl =  this.searchProfile.get('itemsInParallel');
+    this.itemsPerPageControl =  this.searchProfile.get('itemsPerPage');
 
     this.errorMessage = "";
     this.infoMessage = "";
@@ -52,14 +57,17 @@ export class HomeComponent implements OnInit {
 
   public getNextPageResults(pageNumber: number) : void {
     let userName = this.userNameControl.value;
-    let itemsInParallel = this.itemsInParallelControl.value;
+    let itemsInParallel = this.itemsInParallelControl.value || 3;
 
+    this.pageSize = this.itemsPerPageControl.value || 50;
     this.allTracksCount = 0;
     this.handledTracksCount = 0;
     this.errorMessage = '';
     this.infoMessage = '';
     this.isLoading = true;
     this.tracksPage = null;
+
+    console.log(`Page size ${this.pageSize}`);
 
     this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, this.pageSize)
       .pipe(mergeMap(page => {
@@ -118,7 +126,7 @@ export class HomeComponent implements OnInit {
         let nonTrendingTracksCount = notFirstPage.length;
 
         if (allTracksCount != nonTrendingTracksCount)
-          this.infoMessage = `Non trending documents: ${nonTrendingTracksCount} of ${allTracksCount}`;
+          this.infoMessage = `Не на першій сторінці пошуку: ${nonTrendingTracksCount} із ${allTracksCount}`;
   
           //result.records = notFirstPage;
 
