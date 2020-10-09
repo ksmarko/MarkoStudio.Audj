@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   public pageSize: number = 30;
 
   private userNameControl: AbstractControl;
+  private itemsInParallelControl: AbstractControl;
   public searchProfile: FormGroup;
 
   public errorMessage: string;
@@ -37,9 +38,11 @@ export class HomeComponent implements OnInit {
   public ngOnInit(): void {
     this.searchProfile = this.formBuilder.group({
       userName: [null, [Validators.required, Validators.pattern('[^\w]'), Validators.nullValidator]],
+      itemsInParallel: [null],
     });
 
     this.userNameControl =  this.searchProfile.get('userName');
+    this.itemsInParallelControl =  this.searchProfile.get('itemsInParallel');
 
     this.errorMessage = "";
     this.infoMessage = "";
@@ -49,6 +52,7 @@ export class HomeComponent implements OnInit {
 
   public getNextPageResults(pageNumber: number) : void {
     let userName = this.userNameControl.value;
+    let itemsInParallel = this.itemsInParallelControl.value;
 
     this.allTracksCount = 0;
     this.handledTracksCount = 0;
@@ -76,7 +80,9 @@ export class HomeComponent implements OnInit {
           }));
         });
       
-        let numberOfObjects = 1; // <-- decides number of objects in each group
+        console.log(`Items in parallel: ${itemsInParallel}`);
+
+        let numberOfObjects = itemsInParallel; // <-- decides number of objects in each group
       
         let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
           
