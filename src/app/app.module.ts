@@ -11,16 +11,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import { JwPaginationComponent } from 'jw-angular-pagination/lib/jw-pagination.component';
-import { JwPaginationModule } from 'jw-angular-pagination';
 
 @NgModule({
   declarations: [
     AppComponent,
     SearchComponent,
     HomeComponent,
-    TrackInfoComponent,
-    JwPaginationComponent
+    TrackInfoComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +26,6 @@ import { JwPaginationModule } from 'jw-angular-pagination';
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
-    JwPaginationModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' }
     ])

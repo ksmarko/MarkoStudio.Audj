@@ -12,9 +12,9 @@ import { TrackStatisticsSearchService } from '../services/track-statistics-searc
 export class HomeComponent implements OnInit {
   public tracksPage: Page;
 
-  public totalPagesCount: number;
+  public totalTracksCount: number;
   public currentPage: number = 1;
-  public pageSize: number = 10;
+  public pageSize: number = 30;
 
   private userNameControl: AbstractControl;
   public searchProfile: FormGroup;
@@ -60,6 +60,7 @@ export class HomeComponent implements OnInit {
     this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, this.pageSize)
       .pipe(mergeMap(page => {
       
+        this.totalTracksCount = page.total_hits;
         this.allTracksCount = page.matches.length;
 
         let recordsObservables = page.matches.map(track => {
@@ -75,7 +76,7 @@ export class HomeComponent implements OnInit {
           }));
         });
       
-        let numberOfObjects = 1 // <-- decides number of objects in each group
+        let numberOfObjects = 1; // <-- decides number of objects in each group
       
         let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
           
@@ -116,7 +117,6 @@ export class HomeComponent implements OnInit {
           //result.records = notFirstPage;
 
           this.currentPage = pageNumber;
-          this.totalPagesCount = Math.ceil(result.totalHits / this.pageSize);
           this.tracksPage = result;
       }, error => {
 
