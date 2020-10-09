@@ -11,7 +11,7 @@ import { TrackStatisticsSearchService, TrackSearchResponse, TracksPageResponse }
 })
 export class SearchComponent implements OnInit {
 
-  @Output('userChange') userChangeEmitter: EventEmitter<Page> = new EventEmitter<Page>();
+  //@Output('userChange') userChangeEmitter: EventEmitter<Page> = new EventEmitter<Page>();
 
   private userNameControl: AbstractControl;
   public searchProfile: FormGroup;
@@ -51,135 +51,192 @@ export class SearchComponent implements OnInit {
     this.handledTracksCount = 0;
     this.errorMessage = '';
     this.infoMessage = '';
-    this.userChangeEmitter.emit(null); 
+    //this.userChangeEmitter.emit(null); 
     this.isLoading = true;
 
     let pageNumber = 1;
     let pageSize = 100;
 
-    this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
-    .pipe(mergeMap(page => {
-      let pages : Observable<TracksPageResponse>[] = new Array<Observable<TracksPageResponse>>();
-      let totalPages = Math.ceil(page.total_hits / pageSize) + 1;
+    //////////////////
 
-      for (let p = pageNumber + 1; p < totalPages; p++){
+    // this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
+    //   .pipe(mergeMap(page => {
+      
+    //     let records = forkJoin(page.matches.map(track => {
 
-        let item = this.trackStatisticsSearchService.getTracksPage(userName, p, pageSize);
-        pages.push(item);
-      }
+    //       return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
+    //       .pipe(map(r => {
 
-      return forkJoin(pages).pipe(mergeMap(c => {
-        let matches = new Array<TrackSearchResponse>().concat(...c.concat(page).map(item => item.matches));
+    //         let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
 
-        this.allTracksCount = matches.length;
+    //         return new Record(track.id, track.name, track.url, isOnFirstPage);
+    //       }));
+    //     }));
 
-        let recordsObservables = matches.map(track => {
+    //     let a = records.pipe(map(tr => {
 
-          return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
-          .pipe(map(r => {
+    //       let links = new Links(page.links.next_page_url, page.links.prev_page_url, page.links.first_page_url, page.links.last_page_url);
+
+    //       return new Page(links, page.total_hits, tr);
+    //     }));
+
+    //     return a;
+    //   }))
+    //   .subscribe(result => {
+    //     this.isLoading = false;
+
+    //     result.records = result.records.sort((a, b) => a.trackName.localeCompare(b.trackName));
+
+    //     let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
+
+    //     let allTracksCount = result.records.length;
+    //     let nonTrendingTracksCount = notFirstPage.length;
+
+    //     if (allTracksCount != nonTrendingTracksCount)
+    //       this.infoMessage = `Showing ${nonTrendingTracksCount} of ${allTracksCount}`;
   
-            this.handledTracksCount++;
+    //       result.records = notFirstPage;
 
-            let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
+    //     this.userChangeEmitter.emit(result);
+    //   }, error => {
+
+    //     this.isLoading = false;
+
+    //     if (error.status == 404)
+    //       this.errorMessage = 'Сторінка не знайдена';
   
-            return new Record(track.id, track.name, track.url, isOnFirstPage);
-          }));
-        });
+    //     if (error.status >= 400)
+    //       this.errorMessage = 'Щось пішло не так. Спробуйте пізніше';
+  
+    //     this.userChangeEmitter.emit(null);
+    // });
 
-        let numberOfObjects = 1 // <-- decides number of objects in each group
+////////////////////////////
 
-        let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
-          const chunkIndex = Math.floor(index/numberOfObjects);
 
-          if(!resultArray[chunkIndex]) {
-            resultArray[chunkIndex] = []; // start a new chunk
-          }
+    // this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, pageSize)
+    // .pipe(mergeMap(page => {
+    //   let pages : Observable<TracksPageResponse>[] = new Array<Observable<TracksPageResponse>>();
+    //   let totalPages = Math.ceil(page.total_hits / pageSize) + 1;
 
-          resultArray[chunkIndex].push(item);
+    //   for (let p = pageNumber + 1; p < totalPages; p++){
 
-          return resultArray;
-        }, []);
+    //     let item = this.trackStatisticsSearchService.getTracksPage(userName, p, pageSize);
+    //     pages.push(item);
+    //   }
 
-        let records = forkJoin(groupedProducts[0]);
+    //   return forkJoin(pages).pipe(mergeMap(c => {
+    //     let matches = new Array<TrackSearchResponse>().concat(...c.concat(page).map(item => item.matches));
 
-        for (let i = 1; i < groupedProducts.length; i++){
-          records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
-        }
+    //     this.allTracksCount = matches.length;
 
-        return records.pipe(map(tr => {
-            return new Page(null, 0, tr);
-        }));
-      }));
-    }))
-    .subscribe(result => {
-      this.isLoading = false;
+    //     let recordsObservables = matches.map(track => {
 
-      result.records = result.records.sort((a, b) => a.trackName.localeCompare(b.trackName));
+    //       return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
+    //       .pipe(map(r => {
+  
+    //         this.handledTracksCount++;
 
-      console.log(`Records count: ${result.records.length}`);
+    //         let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
+  
+    //         return new Record(track.id, track.name, track.url, isOnFirstPage);
+    //       }));
+    //     });
 
-      let allTracksCount = result.records.length;
-      let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
+    //     let numberOfObjects = 1 // <-- decides number of objects in each group
 
-      let nonTrendingTracksCount = notFirstPage.length;
+    //     let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
+    //       const chunkIndex = Math.floor(index/numberOfObjects);
 
-      if (allTracksCount != nonTrendingTracksCount)
-        this.infoMessage = `Всього треків: ${allTracksCount}. Не на першій сторінці пошуку: ${nonTrendingTracksCount}`;
+    //       if(!resultArray[chunkIndex]) {
+    //         resultArray[chunkIndex] = []; // start a new chunk
+    //       }
 
-        result.records = notFirstPage;
+    //       resultArray[chunkIndex].push(item);
 
-      this.userChangeEmitter.emit(result);
-    }, error => {
+    //       return resultArray;
+    //     }, []);
 
-      this.isLoading = false;
+    //     let records = forkJoin(groupedProducts[0]);
 
-      if (error.status == 404)
-        this.errorMessage = 'Сторінка не знайдена';
+    //     for (let i = 1; i < groupedProducts.length; i++){
+    //       records = records.pipe(mergeMap(r => forkJoin(groupedProducts[i]).pipe(map(p => p.concat(r)))));
+    //     }
 
-      if (error.status >= 400)
-        this.errorMessage = 'Щось пішло не так. Спробуйте пізніше';
+    //     return records.pipe(map(tr => {
+    //         return new Page(null, 0, tr);
+    //     }));
+    //   }));
+    // }))
+    // .subscribe(result => {
+    //   this.isLoading = false;
 
-      this.userChangeEmitter.emit(null);
-    });
+    //   result.records = result.records.sort((a, b) => a.trackName.localeCompare(b.trackName));
+
+    //   console.log(`Records count: ${result.records.length}`);
+
+    //   let allTracksCount = result.records.length;
+    //   let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
+
+    //   let nonTrendingTracksCount = notFirstPage.length;
+
+    //   if (allTracksCount != nonTrendingTracksCount)
+    //     this.infoMessage = `Всього треків: ${allTracksCount}. Не на першій сторінці пошуку: ${nonTrendingTracksCount}`;
+
+    //     result.records = notFirstPage;
+
+    //   this.userChangeEmitter.emit(result);
+    // }, error => {
+
+    //   this.isLoading = false;
+
+    //   if (error.status == 404)
+    //     this.errorMessage = 'Сторінка не знайдена';
+
+    //   if (error.status >= 400)
+    //     this.errorMessage = 'Щось пішло не так. Спробуйте пізніше';
+
+    //   this.userChangeEmitter.emit(null);
+    // });
   }
 }
 
-export class Page {
-  links: Links;
-  totalHits: number;
-  records: Record[];
+// export class Page {
+//   links: Links;
+//   totalHits: number;
+//   records: Record[];
 
-  constructor(links: Links, totalHits: number, records: Record[]){
-    this.links = links;
-    this.totalHits = totalHits;
-    this.records = records;
-  }
-}
+//   constructor(links: Links, totalHits: number, records: Record[]){
+//     this.links = links;
+//     this.totalHits = totalHits;
+//     this.records = records;
+//   }
+// }
 
-export class Record {
-  id: number;
-  trackName: string;
-  trackUrl: string;
-  isOnFirstPage: boolean;
+// export class Record {
+//   id: number;
+//   trackName: string;
+//   trackUrl: string;
+//   isOnFirstPage: boolean;
 
-  constructor(id: number,trackName: string, trackUrl: string, isOnFirstPage: boolean){
-    this.id = id;
-    this.trackName = trackName;
-    this.trackUrl = trackUrl;
-    this.isOnFirstPage = isOnFirstPage;
-  }
-}
+//   constructor(id: number,trackName: string, trackUrl: string, isOnFirstPage: boolean){
+//     this.id = id;
+//     this.trackName = trackName;
+//     this.trackUrl = trackUrl;
+//     this.isOnFirstPage = isOnFirstPage;
+//   }
+// }
 
-export class Links {
-  next_page_url: string;
-  prev_page_url: string;
-  first_page_url: string;
-  last_page_url: string;
+// export class Links {
+//   next_page_url: string;
+//   prev_page_url: string;
+//   first_page_url: string;
+//   last_page_url: string;
 
-  constructor(next_page_url: string, prev_page_url: string, first_page_url: string, last_page_url: string){
-    this.next_page_url = next_page_url;
-    this.prev_page_url = prev_page_url;
-    this.first_page_url = first_page_url;
-    this.last_page_url = last_page_url;
-  }
-}
+//   constructor(next_page_url: string, prev_page_url: string, first_page_url: string, last_page_url: string){
+//     this.next_page_url = next_page_url;
+//     this.prev_page_url = prev_page_url;
+//     this.first_page_url = first_page_url;
+//     this.last_page_url = last_page_url;
+//   }
+// }
