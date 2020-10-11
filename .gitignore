@@ -286,3 +286,6 @@ __pycache__/
 *.orig
 .vscode
 appsettings.LocalBox.json
+
+.env
+src/environments/

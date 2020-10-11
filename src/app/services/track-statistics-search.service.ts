@@ -2,12 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class TrackStatisticsSearchService {
-
-    //private key: string = 'Xak16vI58CMsfRusJcNifADxfKTDAiHk';
-    private key: string = 'UaFDgUEXtSND5ToRnghqopJnTOTSGetB';
 
     constructor(
         private httpClient: HttpClient,
@@ -18,7 +16,7 @@ export class TrackStatisticsSearchService {
         let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}&sort_by=name&sort_direction=asc`;
 
         let headers = {
-            'Authorization': `Bearer ${this.key}`
+            'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
         return this.httpClient.get<TracksPageResponse>(url, {headers: headers});
@@ -28,7 +26,7 @@ export class TrackStatisticsSearchService {
         let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}`;
 
         let headers = {
-            'Authorization': `Bearer ${this.key}`
+            'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
         return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
@@ -55,7 +53,7 @@ export class TrackStatisticsSearchService {
         }
 
         let headers = {
-            'Authorization': `Bearer ${this.key}`
+            'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
         return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers });
