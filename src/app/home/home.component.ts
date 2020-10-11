@@ -84,7 +84,7 @@ export class HomeComponent implements OnInit {
       
             let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
         
-            return new Record(track.id, track.name, track.url, isOnFirstPage);
+            return new Record(track.id, track.name, track.published_at, track.url, isOnFirstPage);
           }), catchError(err => {
             this.errorMessage = 'Забагато запитів. Спробуйте пізніше, зменшивши кількість одночасних запитів і кількість треків на сторінці';
             return throwError(err);
@@ -125,7 +125,7 @@ export class HomeComponent implements OnInit {
       .subscribe(result => {
         this.isLoading = false;
 
-        result.records = result.records.sort((a, b) => a.trackName.localeCompare(b.trackName));
+        result.records = result.records.slice().sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
         let notFirstPage = result.records.filter(rec => rec.isOnFirstPage == false);
 
@@ -135,8 +135,6 @@ export class HomeComponent implements OnInit {
         if (allTracksCount != nonTrendingTracksCount)
           this.infoMessage = `Не на першій сторінці пошуку: ${nonTrendingTracksCount} із ${allTracksCount}`;
   
-          //result.records = notFirstPage;
-
           this.currentPage = pageNumber;
           this.tracksPage = result;
       }, error => {
@@ -167,12 +165,14 @@ export class Page {
 export class Record {
   id: number;
   trackName: string;
+  publishedAt: string;
   trackUrl: string;
   isOnFirstPage: boolean;
 
-  constructor(id: number,trackName: string, trackUrl: string, isOnFirstPage: boolean){
+  constructor(id: number, trackName: string, publishedAt: string, trackUrl: string, isOnFirstPage: boolean){
     this.id = id;
     this.trackName = trackName;
+    this.publishedAt = publishedAt;
     this.trackUrl = trackUrl;
     this.isOnFirstPage = isOnFirstPage;
   }

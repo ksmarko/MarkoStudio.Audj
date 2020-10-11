@@ -13,7 +13,7 @@ export class TrackStatisticsSearchService {
     }
 
     public getTracksPage(username: string, pageNumber: number, pageSize: number): Observable<TracksPageResponse> {
-        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}&sort_by=name&sort_direction=asc`;
+        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}&sort_by=date&sort_direction=desc`;
 
         let headers = {
             'Authorization': `Bearer ${environment.ENVATO_KEY}`
@@ -32,7 +32,7 @@ export class TrackStatisticsSearchService {
         return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
             .pipe(
                 map((response: any) => {
-                    return response.matches.map(match => new TrackSearchResponse(match.id, match.name, match.url, match.author_username));
+                    return response.matches.map(match => new TrackSearchResponse(match.id, match.name, match.published_at, match.url, match.author_username));
                 }));
     }
 
@@ -76,12 +76,14 @@ export class TracksPageLinksResponse{
 export class TrackSearchResponse{
     id: number;
     name: string;
+    published_at: string;
     url: string;
     author_username: string;
 
-    constructor(id: number, name: string, url: string, author: string){
+    constructor(id: number, name: string, published_at: string, url: string, author: string){
         this.id = id;
         this.name = name;
+        this.published_at = published_at;
         this.url = url;
         this.author_username = author;
     }
