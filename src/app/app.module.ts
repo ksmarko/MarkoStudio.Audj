@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {GoogleAnalyticsService} from './services/google-analytics.service';
 
 @NgModule({
   declarations: [
@@ -28,9 +29,12 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     NgbModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' }
-    ])
+    ]),
   ],
-  providers: [TrackStatisticsSearchService],
+  providers: [
+    TrackStatisticsSearchService,
+    GoogleAnalyticsService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

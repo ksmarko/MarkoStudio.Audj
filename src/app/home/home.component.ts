@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { TrackStatisticsSearchService } from '../services/track-statistics-search.service';
+
+import { GoogleAnalyticsService } from '../services/google-analytics.service';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +37,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private trackStatisticsSearchService: TrackStatisticsSearchService,
+    private googleAnalyticsService: GoogleAnalyticsService,
     private formBuilder: FormBuilder
   ) { }
 
@@ -67,6 +70,13 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     this.tracksPage = null;
 
+    this.googleAnalyticsService.eventEmitter(
+      "page_results", 
+      "page", 
+      "getNextPageResults", 
+      `Username: ${userName}, pageNumber: ${pageNumber}, pageSize: ${this.pageSize}, itemsInParallel: ${itemsInParallel}, date: ${new Date()}`
+    );
+
     console.log(`Page size ${this.pageSize}`);
 
     this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, this.pageSize)
@@ -87,6 +97,14 @@ export class HomeComponent implements OnInit {
             return new Record(track.id, track.name, track.published_at, track.url, isOnFirstPage);
           }), catchError(err => {
             this.errorMessage = 'Забагато запитів. Спробуйте пізніше, зменшивши кількість одночасних запитів і кількість треків на сторінці';
+
+            this.googleAnalyticsService.eventEmitter(
+              "page_results", 
+              "error", 
+              "error_during_searching_track", 
+              `Username: ${userName}, pageNumber: ${pageNumber}, pageSize: ${this.pageSize}, itemsInParallel: ${itemsInParallel}, date: ${new Date()}`
+            );
+
             return throwError(err);
           }));
         });
@@ -120,6 +138,14 @@ export class HomeComponent implements OnInit {
       }), catchError(err => {
         console.log('Error during fetching user tracks ', err);
         this.errorMessage = 'Забагато запитів. Спробуйте пізніше';
+
+        this.googleAnalyticsService.eventEmitter(
+          "page_results", 
+          "error", 
+          "error_during_fetching_user_tracks", 
+          `Username: ${userName}, pageNumber: ${pageNumber}, pageSize: ${this.pageSize}, itemsInParallel: ${itemsInParallel}, date: ${new Date()}`
+        );
+
         return throwError(err);
     }))
       .subscribe(result => {
@@ -148,6 +174,13 @@ export class HomeComponent implements OnInit {
           this.errorMessage = 'Щось пішло не так. Спробуйте пізніше';
   
         this.tracksPage = null;
+
+        this.googleAnalyticsService.eventEmitter(
+          "page_results", 
+          "error", 
+          "general_error", 
+          `Username: ${userName}, pageNumber: ${pageNumber}, pageSize: ${this.pageSize}, itemsInParallel: ${itemsInParallel}, date: ${new Date()}, errorCode: ${error.status}`
+        );
     });
   }
 }
