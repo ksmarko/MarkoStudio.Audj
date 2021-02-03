@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
@@ -12,39 +12,22 @@ export class TrackStatisticsSearchService {
     ) {
     }
 
-    public getTracksPage(username: string, pageNumber: number, pageSize: number): Observable<TracksPageResponse> {
+    public getUserTracksPage(username: string, pageNumber: number, pageSize: number): Observable<TracksPageResponse> {
         let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}&page=${pageNumber}&page_size=${pageSize}&sort_by=date&sort_direction=desc`;
 
         let headers = {
             'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
-        return this.httpClient.get<TracksPageResponse>(url, {headers: headers});
+        return this.httpClient.get<TracksPageResponse>(url, {headers: headers, observe: 'response'})
+        .pipe(map(resp => {
+            return resp.body;
+        }));
     }
 
-    public getTrackNames(username: string) : Observable<TrackSearchResponse[]> {
-        let url = `https://api.envato.com/v1/discovery/search/search/item?username=${username}`;
-
-        let headers = {
-            'Authorization': `Bearer ${environment.ENVATO_KEY}`
-        };
-
-        return this.httpClient.get<TrackSearchResponse[]>(url, {headers: headers})
-            .pipe(
-                map((response: any) => {
-                    return response.matches.map(match => new TrackSearchResponse(match.id, match.name, match.published_at, match.url, match.author_username));
-                }));
-    }
-
-    public getTotalMatches(term: string) : Observable<TotalMatchesResponse> {
-        var url = `https://cors-anywhere.herokuapp.com/https://audiojungle.net/shopfront-api/search?page=1&page_size=1&site=audiojungle.net&sort_by=relevance&term=${term}`;
+    public getFirstPageByTrackName(term: string, pageSize: number) : Observable<TermSearchResult> {
     
-        return this.httpClient.get<TotalMatchesResponse>(url);
-    }
-
-    public searchProfile(term: string, pageNumber: number, pageSize: number) : Observable<TermSearchResult> {
-    
-        var url = `https://api.envato.com/v1/discovery/search/search/item?page=${pageNumber}&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
+        var url = `https://api.envato.com/v1/discovery/search/search/item?page=1&page_size=${pageSize}&site=audiojungle.net&sort_by=relevance`;
     
         let params = new HttpParams();
 
@@ -56,7 +39,16 @@ export class TrackStatisticsSearchService {
             'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
-        return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers });
+        return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers, observe: 'response' })
+        .pipe(
+            delay(this.simulateLongResponse()), //delay in ms
+            map(resp => {
+            return resp.body;
+        }));
+    }
+
+    private simulateLongResponse(): number {
+        return Math.floor(Math.random() * 10) * 1000;
     }
 }
 
@@ -87,10 +79,6 @@ export class TrackSearchResponse{
         this.url = url;
         this.author_username = author;
     }
-}
-
-export class TotalMatchesResponse {
-    total_hits: number;
 }
 
 export class TermSearchResult{

@@ -79,7 +79,7 @@ export class HomeComponent implements OnInit {
 
     console.log(`Page size ${this.pageSize}`);
 
-    this.trackStatisticsSearchService.getTracksPage(userName, pageNumber, this.pageSize)
+    this.trackStatisticsSearchService.getUserTracksPage(userName, pageNumber, this.pageSize)
       .pipe(mergeMap(page => {
       
         this.totalTracksCount = page.total_hits;
@@ -87,7 +87,9 @@ export class HomeComponent implements OnInit {
 
         let recordsObservables = page.matches.map(track => {
 
-          return this.trackStatisticsSearchService.searchProfile(track.name, 1, 30)
+          let defaultAudioJungleSearchPageSize = 30;
+          
+          return this.trackStatisticsSearchService.getFirstPageByTrackName(track.name, defaultAudioJungleSearchPageSize)
           .pipe(map(r => {
         
             this.handledTracksCount++;
