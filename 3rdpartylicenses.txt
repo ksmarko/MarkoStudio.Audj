@@ -41,9 +41,6 @@ MIT
 @angular/router
 MIT
 
-@firebase/logger
-Apache-2.0
-
 @ng-bootstrap/ng-bootstrap
 MIT
 The MIT License (MIT)
