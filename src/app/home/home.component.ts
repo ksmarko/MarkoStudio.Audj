@@ -17,11 +17,9 @@ export class HomeComponent implements OnInit {
   public totalTracksCount: number;
   public currentPage: number = 1;
   public pageSize: number = 30;
-  public availableParallelizationItems: Array<number> = [1,2,3,4,5,6,7,8,9,10];
   public availableItemsPerPage: Array<number> = [10, 30, 50, 100];
 
   private userNameControl: AbstractControl;
-  private itemsInParallelControl: AbstractControl;
   private itemsPerPageControl: AbstractControl;
   public searchProfile: FormGroup;
 
@@ -44,12 +42,10 @@ export class HomeComponent implements OnInit {
   public ngOnInit(): void {
     this.searchProfile = this.formBuilder.group({
       userName: [null, [Validators.required, Validators.pattern('[^\w]'), Validators.nullValidator]],
-      itemsInParallel: [null],
       itemsPerPage: [null],
     });
 
     this.userNameControl =  this.searchProfile.get('userName');
-    this.itemsInParallelControl =  this.searchProfile.get('itemsInParallel');
     this.itemsPerPageControl =  this.searchProfile.get('itemsPerPage');
 
     this.errorMessage = "";
@@ -60,7 +56,7 @@ export class HomeComponent implements OnInit {
 
   public getNextPageResults(pageNumber: number) : void {
     let userName = this.userNameControl.value;
-    let itemsInParallel = this.itemsInParallelControl.value || 3;
+    let itemsInParallel = 10;
 
     this.pageSize = this.itemsPerPageControl.value || 30;
     this.allTracksCount = 0;
@@ -109,8 +105,6 @@ export class HomeComponent implements OnInit {
           }));
         });
       
-        console.log(`Items in parallel: ${itemsInParallel}`);
-
         let numberOfObjects = itemsInParallel; // <-- decides number of objects in each group
       
         let groupedProducts = recordsObservables.reduce((resultArray: Observable<Record>[][], item: Observable<Record>, index: number) => { 
