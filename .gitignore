@@ -191,6 +191,8 @@ ClientBin/
 node_modules/
 orleans.codegen.cs
 
+dist/
+
 # RIA/Silverlight projects
 Generated_Code/
 
@@ -284,3 +286,6 @@ __pycache__/
 *.orig
 .vscode
 appsettings.LocalBox.json
+
+.env
+src/environments/
