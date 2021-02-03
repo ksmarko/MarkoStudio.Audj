@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, Observable, throwError } from 'rxjs';
+import { forkJoin, Observable, throwError, EMPTY } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { TrackStatisticsSearchService } from '../services/track-statistics-search.service';
 
@@ -77,6 +77,15 @@ export class HomeComponent implements OnInit {
 
     this.trackStatisticsSearchService.getUserTracksPage(userName, pageNumber, this.pageSize)
       .pipe(mergeMap(page => {
+
+        if (page.total_hits == 0 || page.matches.length == 0 || page.links.first_page_url == null){
+
+          this.errorMessage = "Автор не знайдений або нема треків";
+          this.isLoading = false;
+          this.tracksPage = null;
+
+          return EMPTY;
+        }
       
         this.totalTracksCount = page.total_hits;
         this.allTracksCount = page.matches.length;
