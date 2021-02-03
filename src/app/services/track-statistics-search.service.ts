@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { delay, map, mergeMap, retry, retryWhen } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { delay, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
@@ -21,8 +21,6 @@ export class TrackStatisticsSearchService {
 
         return this.httpClient.get<TracksPageResponse>(url, {headers: headers, observe: 'response'})
         .pipe(map(resp => {
-            console.log(resp.headers);
-
             return resp.body;
         }));
     }
@@ -45,8 +43,6 @@ export class TrackStatisticsSearchService {
         .pipe(
             delay(this.simulateLongResponse()), //delay in ms
             map(resp => {
-            //console.log(resp.headers);
-
             return resp.body;
         }));
     }
