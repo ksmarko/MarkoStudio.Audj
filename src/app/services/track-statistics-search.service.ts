@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { delay, map, mergeMap, retry, retryWhen } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
@@ -19,7 +19,12 @@ export class TrackStatisticsSearchService {
             'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
-        return this.httpClient.get<TracksPageResponse>(url, {headers: headers});
+        return this.httpClient.get<TracksPageResponse>(url, {headers: headers, observe: 'response'})
+        .pipe(map(resp => {
+            console.log(resp.headers);
+
+            return resp.body;
+        }));
     }
 
     public getTrackNames(username: string) : Observable<TrackSearchResponse[]> {
@@ -56,7 +61,14 @@ export class TrackStatisticsSearchService {
             'Authorization': `Bearer ${environment.ENVATO_KEY}`
         };
 
-        return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers });
+        return this.httpClient.get<TermSearchResult>(url, { params: params, headers: headers, observe: 'response' })
+        .pipe(
+            delay(10000), //delay in ms
+            map(resp => {
+            console.log(resp);
+
+            return resp.body;
+        }));
     }
 }
 
