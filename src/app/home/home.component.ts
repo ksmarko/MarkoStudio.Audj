@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
       
             let isOnFirstPage = r.matches.some(match => match.author_username == track.author_username && match.name == track.name);
         
-            return new Record(track.id, track.name, track.published_at, track.url, isOnFirstPage);
+            return new Record(track.id, track.name, track.published_at, track.url, isOnFirstPage, track.number_of_sales);
           }), catchError(err => {
             this.errorMessage = 'Забагато запитів. Спробуйте пізніше, зменшивши кількість одночасних запитів і кількість треків на сторінці';
 
@@ -206,12 +206,14 @@ export class Record {
   publishedAt: string;
   trackUrl: string;
   isOnFirstPage: boolean;
+  salesCount: number;
 
-  constructor(id: number, trackName: string, publishedAt: string, trackUrl: string, isOnFirstPage: boolean){
+  constructor(id: number, trackName: string, publishedAt: string, trackUrl: string, isOnFirstPage: boolean, salesCount: number){
     this.id = id;
     this.trackName = trackName;
     this.publishedAt = publishedAt;
     this.trackUrl = trackUrl;
     this.isOnFirstPage = isOnFirstPage;
+    this.salesCount = salesCount;
   }
 }

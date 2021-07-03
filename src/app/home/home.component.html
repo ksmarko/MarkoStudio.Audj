@@ -46,6 +46,7 @@
             <th>Трек</th>
             <th>Лінк</th>
             <th style="text-align: center">На першій сторінці?</th>
+            <th style="text-align: center">К-сть продаж</th>
           </tr>
         </thead>
         <tbody>
@@ -59,6 +60,9 @@
             <td style="text-align: center">
               <i *ngIf="record.isOnFirstPage" class="fa fa-check-circle itemsuccess"></i>
               <i *ngIf="!record.isOnFirstPage" class="fa fa-times-circle itemfail"></i>
+            </td>
+            <td style="text-align: center">
+              {{record.salesCount}}
             </td>
           </tr>
         </tbody>

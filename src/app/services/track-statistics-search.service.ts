@@ -71,13 +71,15 @@ export class TrackSearchResponse{
     published_at: string;
     url: string;
     author_username: string;
+    number_of_sales: number;
 
-    constructor(id: number, name: string, published_at: string, url: string, author: string){
+    constructor(id: number, name: string, published_at: string, url: string, author: string, salesCount: number){
         this.id = id;
         this.name = name;
         this.published_at = published_at;
         this.url = url;
         this.author_username = author;
+        this.number_of_sales = salesCount;
     }
 }
 
